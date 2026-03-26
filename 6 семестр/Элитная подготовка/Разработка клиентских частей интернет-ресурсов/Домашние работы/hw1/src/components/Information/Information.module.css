@@ -1,0 +1,51 @@
+.info {
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.info h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+}
+
+.info p {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.info li {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .info {
+        padding: 1.5rem;
+    }
+    .info h2 {
+        font-size: 1.5rem;
+    }
+    .info p, .info li {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .info {
+        padding: 1rem;
+    }
+    .info h2 {
+        font-size: 1.3rem;
+    }
+    .info p, .info li {
+        font-size: 0.9rem;
+    }
+}

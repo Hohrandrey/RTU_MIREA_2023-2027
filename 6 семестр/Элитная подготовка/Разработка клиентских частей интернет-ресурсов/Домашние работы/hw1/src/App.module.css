@@ -1,0 +1,63 @@
+.app {
+    font-family: Arial, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.light {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f4f4;
+    --bg-tertiary: #fafafa;
+    --text-primary: #000000;
+    --text-secondary: #333333;
+    --card-bg: #ffffff;
+    --card-border: #cccccc;
+    --button-bg: #1e3c72;
+    --button-text: #ffffff;
+    --button-active-bg: #ff6b6b;
+    --fact-card-bg: #ecf0f1;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dark {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #2c2c2c;
+    --text-primary: #ffffff;
+    --text-secondary: #dddddd;
+    --card-bg: #2d2d2d;
+    --card-border: #444444;
+    --button-bg: #4a90e2;
+    --button-text: #ffffff;
+    --button-active-bg: #ff8a8a;
+    --fact-card-bg: #2c3e50;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.themeButton {
+    margin: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+    .themeButton {
+        margin: 0.8rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .themeButton {
+        margin: 0.5rem;
+        padding: 0.8rem 1rem;
+        width: calc(100% - 1rem);
+        font-size: 1rem;
+    }
+}

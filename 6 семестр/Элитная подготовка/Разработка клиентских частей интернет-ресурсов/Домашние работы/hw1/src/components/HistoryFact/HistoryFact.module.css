@@ -1,0 +1,76 @@
+.fact {
+    padding: 2rem;
+    text-align: center;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.fact h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+}
+
+.button {
+    padding: 0.5rem 1rem;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.card {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--fact-card-bg);
+    border-radius: 8px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--text-primary);
+}
+
+.card p {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .fact {
+        padding: 1.5rem;
+    }
+    .fact h2 {
+        font-size: 1.5rem;
+    }
+    .button {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    .card {
+        padding: 0.8rem;
+        margin: 1rem auto 0;
+    }
+    .card p {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .fact {
+        padding: 1rem;
+    }
+    .fact h2 {
+        font-size: 1.3rem;
+    }
+    .button {
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+    .card {
+        padding: 0.8rem;
+    }
+    .card p {
+        font-size: 0.9rem;
+    }
+}
