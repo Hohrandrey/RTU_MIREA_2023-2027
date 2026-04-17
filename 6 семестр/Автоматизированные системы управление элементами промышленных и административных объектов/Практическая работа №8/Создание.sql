@@ -17,12 +17,12 @@ DROP TABLE IF EXISTS purchase_requests CASCADE;
 DROP TABLE IF EXISTS external_sources CASCADE;
 
 CREATE TABLE users (
-    id              BIGSERIAL PRIMARY KEY,
-    name            VARCHAR(100) NOT NULL,
+    id                BIGSERIAL PRIMARY KEY,
+    name              VARCHAR(100) NOT NULL,
     email             VARCHAR(255) NOT NULL UNIQUE,
     password_hash     VARCHAR(255) NOT NULL,
     registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    role            VARCHAR(50) NOT NULL DEFAULT 'user',
+    role              VARCHAR(50) NOT NULL DEFAULT 'user',
     status            VARCHAR(50) NOT NULL DEFAULT 'active',
     phone             VARCHAR(20) UNIQUE,
     created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
