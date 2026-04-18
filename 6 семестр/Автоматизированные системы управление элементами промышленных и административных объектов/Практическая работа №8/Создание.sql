@@ -1,217 +1,218 @@
-DROP TABLE IF EXISTS requests CASCADE;
-DROP TABLE IF EXISTS sessions CASCADE;
-DROP TABLE IF EXISTS history CASCADE;
-DROP TABLE IF EXISTS logs CASCADE;
-DROP TABLE IF EXISTS notifications CASCADE;
-DROP TABLE IF EXISTS ml_models CASCADE;
-DROP TABLE IF EXISTS datasets CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS favorites CASCADE;
-DROP TABLE IF EXISTS reviews CASCADE;
-DROP TABLE IF EXISTS content_licenses CASCADE;
-DROP TABLE IF EXISTS licenses CASCADE;
-DROP TABLE IF EXISTS content_categories CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
-DROP TABLE IF EXISTS content CASCADE;
-DROP TABLE IF EXISTS purchase_requests CASCADE;
-DROP TABLE IF EXISTS external_sources CASCADE;
+DROP TABLE IF EXISTS "запросы" CASCADE;
+DROP TABLE IF EXISTS "сессии" CASCADE;
+DROP TABLE IF EXISTS "история" CASCADE;
+DROP TABLE IF EXISTS "логи" CASCADE;
+DROP TABLE IF EXISTS "уведомления" CASCADE;
+DROP TABLE IF EXISTS "нейросетевые_модели" CASCADE;
+DROP TABLE IF EXISTS "наборы_данных" CASCADE;
+DROP TABLE IF EXISTS "пользователи" CASCADE;
+DROP TABLE IF EXISTS "избранное" CASCADE;
+DROP TABLE IF EXISTS "отзывы" CASCADE;
+DROP TABLE IF EXISTS "связь_контента_с_лицензиями" CASCADE;
+DROP TABLE IF EXISTS "лицензии" CASCADE;
+DROP TABLE IF EXISTS "связь_контента_с_категориями" CASCADE;
+DROP TABLE IF EXISTS "категории" CASCADE;
+DROP TABLE IF EXISTS "контент" CASCADE;
+DROP TABLE IF EXISTS "заявки_на_закупку" CASCADE;
+DROP TABLE IF EXISTS "внешние_источники" CASCADE;
 
-CREATE TABLE users (
-    id                BIGSERIAL PRIMARY KEY,
-    name              VARCHAR(100) NOT NULL,
-    email             VARCHAR(255) NOT NULL UNIQUE,
-    password_hash     VARCHAR(255) NOT NULL,
-    registration_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    role              VARCHAR(50) NOT NULL DEFAULT 'user',
-    status            VARCHAR(50) NOT NULL DEFAULT 'active',
-    phone             VARCHAR(20) UNIQUE,
-    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+CREATE TABLE "пользователи" (
+    "идентификатор"     BIGSERIAL PRIMARY KEY,
+    "имя"               VARCHAR(100) NOT NULL,
+    "электронная_почта" VARCHAR(255) NOT NULL UNIQUE,
+    "хеш_пароля"        VARCHAR(255) NOT NULL,
+    "дата_регистрации"  DATE NOT NULL DEFAULT CURRENT_DATE,
+    "роль"              VARCHAR(50) NOT NULL DEFAULT 'пользователь',
+    "статус"            VARCHAR(50) NOT NULL DEFAULT 'активный',
+    "телефон"           VARCHAR(20) UNIQUE,
+    "дата_создания"     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "дата_обновления"   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE sessions (
-    id         BIGSERIAL PRIMARY KEY,
-    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    start_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    end_time   TIMESTAMP,
-    context    TEXT,
-    device     VARCHAR(100),
-    browser    VARCHAR(100),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "сессии" (
+    "идентификатор"              BIGSERIAL PRIMARY KEY,
+    "идентификатор_пользователя" BIGINT NOT NULL REFERENCES "пользователи"("идентификатор") ON DELETE CASCADE,
+    "время_начала"               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "время_окончания"            TIMESTAMP,
+    "контекст"                   TEXT,
+    "устройство"                 VARCHAR(100),
+    "браузер"                    VARCHAR(100),
+    "дата_создания"              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE datasets (
-    id            BIGSERIAL PRIMARY KEY,
-    name          VARCHAR(100) NOT NULL,
-    description   TEXT,
-    record_count  INTEGER DEFAULT 0,
-    creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    format        VARCHAR(50) NOT NULL,
-    file_path     TEXT NOT NULL,
-    status        VARCHAR(50) NOT NULL DEFAULT 'pending',
-    data_source   VARCHAR(255),
-    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "наборы_данных" (
+    "идентификатор"        BIGSERIAL PRIMARY KEY,
+    "название"             VARCHAR(100) NOT NULL,
+    "описание"             TEXT,
+    "количество_записей"   INTEGER DEFAULT 0,
+    "дата_создания_набора" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "формат"               VARCHAR(50) NOT NULL,
+    "путь_к_файлу"         TEXT NOT NULL,
+    "статус"               VARCHAR(50) NOT NULL DEFAULT 'на_рассмотрении',
+    "источник_данных"      VARCHAR(255),
+    "дата_создания"        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE ml_models (
-    id                  BIGSERIAL PRIMARY KEY,
-    training_dataset_id BIGINT REFERENCES datasets(id) ON DELETE SET NULL,
-    name                VARCHAR(100) NOT NULL,
-    version             VARCHAR(50) NOT NULL,
-    training_date       TIMESTAMP,
-    accuracy            DECIMAL(5,4),
-    model_path          TEXT NOT NULL,
-    status              VARCHAR(50) NOT NULL DEFAULT 'inactive',
-    hyperparameters     JSONB,
-    model_size          BIGINT,
-    created_at          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "нейросетевые_модели" (
+    "идентификатор"                   BIGSERIAL PRIMARY KEY,
+    "идентификатор_обучающего_набора" BIGINT REFERENCES "наборы_данных"("идентификатор") ON DELETE SET NULL,
+    "название"                        VARCHAR(100) NOT NULL,
+    "версия"                          VARCHAR(50) NOT NULL,
+    "дата_обучения"                   TIMESTAMP,
+    "точность"                        DECIMAL(5,4),
+    "путь_к_модели"                   TEXT NOT NULL,
+    "статус"                          VARCHAR(50) NOT NULL DEFAULT 'неактивный',
+    "гиперпараметры"                  JSONB,
+    "размер_модели"                   BIGINT,
+    "дата_создания"                   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE requests (
-    id                    BIGSERIAL PRIMARY KEY,
-    session_id            BIGINT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-    processed_by_model_id BIGINT REFERENCES ml_models(id) ON DELETE SET NULL,
-    text                  TEXT NOT NULL,
-    time                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    structured_params     JSONB,
-    status                VARCHAR(50) NOT NULL DEFAULT 'pending',
-    source                VARCHAR(50) NOT NULL DEFAULT 'web',
-    ip_address            INET,
-    created_at            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "запросы" (
+    "идентификатор"                    BIGSERIAL PRIMARY KEY,
+    "идентификатор_сессии"             BIGINT NOT NULL REFERENCES "сессии"("идентификатор") ON DELETE CASCADE,
+    "идентификатор_обработавшей_модел" BIGINT REFERENCES "нейросетевые_модели"("идентификатор") ON DELETE SET NULL,
+    "текст"                            TEXT NOT NULL,
+    "время"                            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "структурированные_параметры"      JSONB,
+    "статус"                           VARCHAR(50) NOT NULL DEFAULT 'на_рассмотрении',
+    "источник_запроса"                 VARCHAR(50) NOT NULL DEFAULT 'веб',
+    "ip_адрес"                         INET,
+    "дата_создания"                    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE history (
-    id          BIGSERIAL PRIMARY KEY,
-    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    action_type VARCHAR(50) NOT NULL,
-    time        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    details     TEXT,
-    duration    INTEGER, -- длительность в секундах, если применимо
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "история" (
+    "идентификатор"              BIGSERIAL PRIMARY KEY,
+    "идентификатор_пользователя" BIGINT NOT NULL REFERENCES "пользователи"("идентификатор") ON DELETE CASCADE,
+    "тип_действия"               VARCHAR(50) NOT NULL,
+    "время"                      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "детали"                     TEXT,
+    "длительность"               INTEGER, -- длительность в секундах, если применимо
+    "дата_создания"              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE logs (
-    id         BIGSERIAL PRIMARY KEY,
-    user_id    BIGINT REFERENCES users(id) ON DELETE SET NULL,
-    time       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    level      VARCHAR(20) NOT NULL,
-    message    TEXT NOT NULL,
-    source     VARCHAR(100) NOT NULL,
-    details    JSONB,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "логи" (
+    "идентификатор"              BIGSERIAL PRIMARY KEY,
+    "идентификатор_пользователя" BIGINT REFERENCES "пользователи"("идентификатор") ON DELETE SET NULL,
+    "время"                      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "уровень"                    VARCHAR(20) NOT NULL,
+    "сообщение"                  TEXT NOT NULL,
+    "источник"                   VARCHAR(100) NOT NULL,
+    "детали"                     JSONB,
+    "дата_создания"              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE notifications (
-    id         BIGSERIAL PRIMARY KEY,
-    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    type       VARCHAR(50) NOT NULL,
-    title      VARCHAR(255) NOT NULL,
-    message    TEXT NOT NULL,
-    date       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_read    BOOLEAN NOT NULL DEFAULT FALSE,
-    link       VARCHAR(255),
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "уведомления" (
+    "идентификатор"              BIGSERIAL PRIMARY KEY,
+    "идентификатор_пользователя" BIGINT NOT NULL REFERENCES "пользователи"("идентификатор") ON DELETE CASCADE,
+    "тип"                        VARCHAR(50) NOT NULL,
+    "заголовок"                  VARCHAR(255) NOT NULL,
+    "сообщение"                  TEXT NOT NULL,
+    "дата"                       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "прочитано"                  BOOLEAN NOT NULL DEFAULT FALSE,
+    "ссылка"                     VARCHAR(255),
+    "дата_создания"              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE content (
-    id          BIGSERIAL PRIMARY KEY,
-    title       VARCHAR(255) NOT NULL,
-    type        VARCHAR(50) NOT NULL,
-    authors     TEXT,
-    description TEXT,
-    level       VARCHAR(50),
-    file_url    TEXT,
-    added_date  DATE NOT NULL DEFAULT CURRENT_DATE,
-    language    VARCHAR(50),
-    avg_rating  DECIMAL(3,2) DEFAULT 0,
-    view_count  INTEGER DEFAULT 0,
-    created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "контент" (
+    "идентификатор"         BIGSERIAL PRIMARY KEY,
+    "название"              VARCHAR(255) NOT NULL,
+    "тип"                   VARCHAR(50) NOT NULL,
+    "авторы"                TEXT,
+    "описание"              TEXT,
+    "уровень"               VARCHAR(50),
+    "сслыка_на_файл"        TEXT,
+    "дата_добавления"       DATE NOT NULL DEFAULT CURRENT_DATE,
+    "язык"                  VARCHAR(50),
+    "средний_рейтинг"       DECIMAL(3,2) DEFAULT 0,
+    "количество_просмотров" INTEGER DEFAULT 0,
+    "дата_создания"         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "дата_обновления"       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE categories (
-    id                 BIGSERIAL PRIMARY KEY,
-    parent_category_id BIGINT REFERENCES categories(id) ON DELETE CASCADE,
-    name               VARCHAR(100) NOT NULL,
-    description        TEXT,
-    creation_date      DATE NOT NULL DEFAULT CURRENT_DATE,
-    content_count      INTEGER DEFAULT 0,
-    icon               VARCHAR(255),
-    created_at         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "категории" (
+    "идентификатор"                    BIGSERIAL PRIMARY KEY,
+    "идентификатор_родительской_катег" BIGINT REFERENCES "категории"("идентификатор") ON DELETE CASCADE,
+    "название"                         VARCHAR(100) NOT NULL,
+    "описание"                         TEXT,
+    "дата_создания_категории"          DATE NOT NULL DEFAULT CURRENT_DATE,
+    "количество_контента"              INTEGER DEFAULT 0,
+    "иконка"                           VARCHAR(255),
+    "дата_создания"                    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE content_categories (
-    content_categories_id BIGSERIAL PRIMARY KEY,
-    content_id            BIGINT NOT NULL REFERENCES content(id) ON DELETE CASCADE,
-    category_id           BIGINT NOT NULL REFERENCES categories(id) ON DELETE CASCADE
+CREATE TABLE "связь_контента_с_категориями" (
+    "идентификатор"           BIGSERIAL PRIMARY KEY,
+    "идентификатор_контента"  BIGINT NOT NULL REFERENCES "контент"("идентификатор") ON DELETE CASCADE,
+    "идентификатор_категории" BIGINT NOT NULL REFERENCES "категории"("идентификатор") ON DELETE CASCADE
 );
 
-CREATE TABLE licenses (
-    id            BIGSERIAL PRIMARY KEY,
-    type          VARCHAR(100) NOT NULL,
-    rights_holder VARCHAR(255),
-    start_date    DATE,
-    end_date      DATE,
-    cost          DECIMAL(10,2),
-    restrictions  TEXT,
-    terms         TEXT,
-    created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "лицензии" (
+    "идентификатор"         BIGSERIAL PRIMARY KEY,
+    "тип"                   VARCHAR(100) NOT NULL,
+    "правообладатель"       VARCHAR(255),
+    "дата_начала"           DATE,
+    "дата_окончания"        DATE,
+    "стоимость"             DECIMAL(10,2),
+    "ограничения"           TEXT,
+    "условия_использования" TEXT,
+    "дата_создания"         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE content_licenses (
-    content_license_id BIGSERIAL PRIMARY KEY,
-    content_id         BIGINT NOT NULL REFERENCES content(id) ON DELETE CASCADE,
-    license_id         BIGINT NOT NULL REFERENCES licenses(id) ON DELETE CASCADE
+CREATE TABLE "связь_контента_с_лицензиями" (
+    "идентификатор"          BIGSERIAL PRIMARY KEY,
+    "идентификатор_контента" BIGINT NOT NULL REFERENCES "контент"("идентификатор") ON DELETE CASCADE,
+    "идентификатор_лицензии" BIGINT NOT NULL REFERENCES "лицензии"("идентификатор") ON DELETE CASCADE
 );
 
-CREATE TABLE reviews (
-    id                BIGSERIAL PRIMARY KEY,
-    user_id           BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    content_id        BIGINT NOT NULL REFERENCES content(id) ON DELETE CASCADE,
-    rating            INTEGER CHECK (rating BETWEEN 1 AND 5),
-    text              TEXT,
-    date              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    moderation_status VARCHAR(50) NOT NULL DEFAULT 'pending',
-    usefulness        INTEGER DEFAULT 0,
-    complaints        INTEGER DEFAULT 0,
-    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "отзывы" (
+    "идентификатор"              BIGSERIAL PRIMARY KEY,
+    "идентификатор_пользователя" BIGINT NOT NULL REFERENCES "пользователи"("идентификатор") ON DELETE CASCADE,
+    "идентификатор_контента"     BIGINT NOT NULL REFERENCES "контент"("идентификатор") ON DELETE CASCADE,
+    "оценка"                     INTEGER CHECK ("оценка" BETWEEN 1 AND 5),
+    "текст"                      TEXT,
+    "дата"                       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "статус_модерации"           VARCHAR(50) NOT NULL DEFAULT 'на_рассмотрении',
+    "полезность"                 INTEGER DEFAULT 0,
+    "жалобы"                     INTEGER DEFAULT 0,
+    "дата_создания"              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE favorites (
-    id         BIGSERIAL PRIMARY KEY,
-    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    content_id BIGINT NOT NULL REFERENCES content(id) ON DELETE CASCADE,
-    added_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    note       TEXT,
-    tags       VARCHAR(255),
-    priority   INTEGER DEFAULT 0,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "избранное" (
+    "идентификатор"              BIGSERIAL PRIMARY KEY,
+    "идентификатор_пользователя" BIGINT NOT NULL REFERENCES "пользователи"("идентификатор") ON DELETE CASCADE,
+    "идентификатор_контента"     BIGINT NOT NULL REFERENCES "контент"("идентификатор") ON DELETE CASCADE,
+    "дата_добавления"            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "заметка"                    TEXT,
+    "теги"                       VARCHAR(255),
+    "приоритет"                  INTEGER DEFAULT 0,
+    "дата_создания"              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE external_sources (
-    id                BIGSERIAL PRIMARY KEY,
-    name              VARCHAR(100) NOT NULL,
-    base_url          VARCHAR(255) NOT NULL,
-    api_key           VARCHAR(255),
-    description       TEXT,
-    status            VARCHAR(50) NOT NULL DEFAULT 'active',
-    connection_params JSONB,
-    data_format       VARCHAR(50) NOT NULL DEFAULT 'json',
-    created_at        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "внешние_источники" (
+    "идентификатор"         BIGSERIAL PRIMARY KEY,
+    "название"              VARCHAR(100) NOT NULL,
+    "базовый_url"           VARCHAR(255) NOT NULL,
+    "api_ключ"              VARCHAR(255),
+    "описание"              TEXT,
+    "статус"                VARCHAR(50) NOT NULL DEFAULT 'активный',
+    "параметры_подключения" JSONB,
+    "формат_данных"         VARCHAR(50) NOT NULL DEFAULT 'json',
+    "дата_создания"         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE purchase_requests (
-    id                     BIGSERIAL PRIMARY KEY,
-    requester_id           BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    content_id             BIGINT REFERENCES content(id) ON DELETE SET NULL,
-    external_source_id     BIGINT REFERENCES external_sources(id) ON DELETE SET NULL,
-    creation_date          TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status                 VARCHAR(50) NOT NULL DEFAULT 'pending',
-    budget                 DECIMAL(10,2),
-    comments               TEXT,
-    suggested_content_text TEXT NOT NULL,
-    justification          TEXT,
-    priority               INTEGER DEFAULT 0,
-    approved_at            TIMESTAMP,
-    created_at             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE "заявки_на_закупку" (
+    "идентификатор"                    BIGSERIAL PRIMARY KEY,
+    "идентификатор_инициатора"         BIGINT NOT NULL REFERENCES "пользователи"("идентификатор") ON DELETE CASCADE,
+    "идентификатор_контента"           BIGINT REFERENCES "контент"("идентификатор") ON DELETE SET NULL,
+    "идентификатор_внешнего_источника" BIGINT REFERENCES "внешние_источники"("идентификатор") ON DELETE SET NULL,
+    "дата_создания_заявки"             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "статус"                           VARCHAR(50) NOT NULL DEFAULT 'на_рассмотрении',
+    "бюджет"                           DECIMAL(10,2),
+    "комментарии"                      TEXT,
+    "предлагаемый_контент_текст"       TEXT NOT NULL,
+    "обоснование"                      TEXT,
+    "приоритет"                        INTEGER DEFAULT 0,
+    "дата_утверждения"                 TIMESTAMP,
+    "дата_создания"                    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

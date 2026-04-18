@@ -1,39 +1,35 @@
-WITH category_stats AS (
+WITH "статистика_категорий" AS (
     SELECT
-        cat.id AS category_id,
-        cat.name AS category_name,
-        COALESCE(SUM(c.view_count), 0) AS total_views,
-        COALESCE(AVG(c.avg_rating), 0) AS avg_rating,
-        COUNT(DISTINCT c.id) AS content_count,
-        COUNT(DISTINCT r.id) AS review_count,
-        COUNT(DISTINCT r.user_id) AS unique_reviewers
-    FROM categories cat
-    LEFT JOIN content_categories cc ON cat.id = cc.category_id
-    LEFT JOIN content c ON cc.content_id = c.id
-    LEFT JOIN reviews r ON c.id = r.content_id AND r.moderation_status = 'approved'
-    GROUP BY cat.id, cat.name
+        "кат"."идентификатор" AS "идентификатор_категории",
+        "кат"."название" AS "категория",
+        COALESCE(SUM("конт"."количество_просмотров"), 0) AS "суммарные_просмотры",
+        COALESCE(AVG("конт"."средний_рейтинг"), 0) AS "средний_рейтинг",
+        COUNT(DISTINCT "конт"."идентификатор") AS "количество_контента",
+        COUNT(DISTINCT "отз"."идентификатор") AS "количество_отзывов"
+    FROM "категории" "кат"
+    LEFT JOIN "связь_контента_с_категориями" "сск" ON "кат"."идентификатор" = "сск"."идентификатор_категории"
+    LEFT JOIN "контент" "конт" ON "сск"."идентификатор_контента" = "конт"."идентификатор"
+    LEFT JOIN "отзывы" "отз" ON "конт"."идентификатор" = "отз"."идентификатор_контента" AND "отз"."статус_модерации" = 'одобрена'
+    GROUP BY "кат"."идентификатор", "кат"."название"
 ),
-purchase_stats AS (
+"статистика_закупок" AS (
     SELECT
-        cat.id AS category_id,
-        COUNT(DISTINCT pr.id) AS purchase_request_count,
-        SUM(pr.budget) AS total_budget_requested
-    FROM categories cat
-    LEFT JOIN content_categories cc ON cat.id = cc.category_id
-    LEFT JOIN content c ON cc.content_id = c.id
-    LEFT JOIN purchase_requests pr ON pr.content_id = c.id AND pr.status = 'approved'
-    GROUP BY cat.id
+        "кат"."идентификатор" AS "идентификатор_категории",
+        COALESCE(SUM("заяв"."бюджет"), 0) AS "бюджет_одобренных_закупок"
+    FROM "категории" "кат"
+    LEFT JOIN "связь_контента_с_категориями" "сск" ON "кат"."идентификатор" = "сск"."идентификатор_категории"
+    LEFT JOIN "контент" "конт" ON "сск"."идентификатор_контента" = "конт"."идентификатор"
+    LEFT JOIN "заявки_на_закупку" "заяв" ON "заяв"."идентификатор_контента" = "конт"."идентификатор" AND "заяв"."статус" = 'одобрена'
+    GROUP BY "кат"."идентификатор"
 )
 SELECT
-    cs.category_name,
-    cs.total_views,
-    cs.avg_rating,
-    cs.content_count,
-    cs.review_count,
-    cs.unique_reviewers,
-    COALESCE(ps.purchase_request_count, 0) AS approved_purchase_requests,
-    COALESCE(ps.total_budget_requested, 0) AS total_approved_budget
-FROM category_stats cs
-LEFT JOIN purchase_stats ps ON cs.category_id = ps.category_id
-ORDER BY cs.total_views DESC
+    "ск"."категория",
+    "ск"."суммарные_просмотры",
+    ROUND("ск"."средний_рейтинг", 2) AS "средний_рейтинг",
+    "ск"."количество_контента",
+    "ск"."количество_отзывов",
+    COALESCE("сз"."бюджет_одобренных_закупок", 0) AS "бюджет_одобренных_закупок"
+FROM "статистика_категорий" "ск"
+LEFT JOIN "статистика_закупок" "сз" ON "ск"."идентификатор_категории" = "сз"."идентификатор_категории"
+ORDER BY "ск"."суммарные_просмотры" DESC
 LIMIT 5;
