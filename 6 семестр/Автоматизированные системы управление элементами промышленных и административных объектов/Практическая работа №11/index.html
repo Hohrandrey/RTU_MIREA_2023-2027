@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Информационный портал АСУ «Семантический подборщик»</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <header>
+        <h1>АСУ «Семантический подборщик»</h1>
+        <p>Интеллектуальная система подбора мультимедийного контента</p>
+    </header>
+
+    <nav>
+        <button class="tab-link active" data-tab="tab1">ℹ️ О системе</button>
+        <button class="tab-link" data-tab="tab2">🔍 Поиск контента</button>
+        <button class="tab-link" data-tab="tab3">📊 Результаты работы</button>
+    </nav>
+
+    <main>
+        <div id="tab1" class="tab-content active">
+            <div class="card">
+                <h2>Общая информация</h2>
+                <p><strong>АСУ «Семантический подборщик»</strong> предназначена для автоматического подбора мультимедийного контента (книги, видео, аудио, подкасты, курсы) по естественно-языковым запросам пользователей. В основе лежит корпоративная нейросеть, выполняющая семантический анализ запросов, определение интента и уровня подготовки пользователя.</p>
+                <p>Система реализована как СППР с элементами управления знаниями и CRM, обеспечивая интеллектуальную поддержку принятия решений при выборе контента.</p>
+            </div>
+            <div class="card">
+                <h2>Технологическая основа</h2>
+                <ul>
+                    <li><strong>NLP-ядро:</strong> дообучаемая нейросеть на базе RuBERT (Hugging Face Transformers, PyTorch)</li>
+                    <li><strong>Поисковый движок:</strong> Elasticsearch для полнотекстового и семантического поиска</li>
+                    <li><strong>База данных:</strong> PostgreSQL с поддержкой JSONB для хранения метаданных и логов</li>
+                    <li><strong>Микросервисная архитектура:</strong> FastAPI (Python), React.js, Docker, Kubernetes</li>
+                    <li><strong>Интеграция:</strong> модули автоматического внешнего поиска (API партнёров) и управления закупками</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>Пользователи системы</h2>
+                <ul>
+                    <li><strong>Клиент</strong> – формулирует запросы, получает подборку контента</li>
+                    <li><strong>Контент-менеджер</strong> – управляет каталогом, одобряет закупки</li>
+                    <li><strong>Администратор нейросети</strong> – дообучает модель, контролирует качество</li>
+                    <li><strong>Руководитель</strong> – утверждает бюджет и стратегию пополнения</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="tab2" class="tab-content">
+            <div class="card">
+                <h2>Форма запроса</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Введите запрос на естественном языке, например: «хочу изучить Python»">
+                    <button onclick="executeSearch()">Найти</button>
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label>Фильтр по типу: </label>
+                    <select id="typeFilter" onchange="executeSearch()">
+                        <option value="all">Все типы</option>
+                        <option value="книга">Книга</option>
+                        <option value="видео">Видео</option>
+                        <option value="аудио">Аудио</option>
+                        <option value="курс">Курс</option>
+                        <option value="подкаст">Подкаст</option>
+                    </select>
+                </div>
+                <div id="searchResults" class="result-grid"></div>
+                <div id="pagination" class="pagination"></div>
+            </div>
+        </div>
+
+        <div id="tab3" class="tab-content">
+            <div class="card">
+                <h2>Сводка показателей (эмуляция)</h2>
+                <div class="metrics">
+                    <div class="metric-box">📋 Обработано запросов<br><span id="totalQueries">12 540</span></div>
+                    <div class="metric-box">🎯 Точность NLP<br><span id="nlpAccuracy">92.3</span>%</div>
+                    <div class="metric-box">📚 Контента в базе<br><span id="contentCount">4 320</span></div>
+                    <div class="metric-box">🛒 Заявок на закупку<br><span id="purchaseOrders">28</span></div>
+                </div>
+                <button class="btn" onclick="refreshStats()">Обновить сводку</button>
+            </div>
+            <div class="card">
+                <h2>Последние запросы пользователей</h2>
+                <table>
+                    <thead>
+                        <tr><th>Время</th><th>Пользователь</th><th>Запрос</th><th>Извлечённые параметры</th><th>Статус</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>10:15</td><td>Иван Петров</td><td>хочу изучить Python</td><td>тема:Python, уровень:начальный</td><td>✅ Обработан</td></tr>
+                        <tr><td>10:17</td><td>Мария Смирнова</td><td>аудиокниги по психологии</td><td>тема:психология, тип:аудио</td><td>✅ Обработан</td></tr>
+                        <tr><td>10:22</td><td>Павел Новиков</td><td>продвинутый курс по Go</td><td>тема:Go, уровень:продвинутый</td><td>✅ Обработан</td></tr>
+                        <tr><td>10:25</td><td>Гость</td><td>скачать книгу Чистый код</td><td>тема:Clean Code, действие:скачать</td><td>⚠️ Нет прав</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h2>Динамика активности (условные единицы)</h2>
+                <p>Последние 7 дней: <strong>1240 → 1350 → 1420 → 1380 → 1500 → 1480 → 1520</strong></p>
+                <p>Среднее время ответа системы: <strong>1.8 сек</strong></p>
+                <p>Доля запросов, потребовавших внешнего поиска: <strong>12%</strong></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2026 Информационный портал АСУ «Семантический подборщик». Учебный проект Враженко Д.О.
+    </footer>
+
+    <script src="./script.js" defer></script>
+</body>
+</html>
