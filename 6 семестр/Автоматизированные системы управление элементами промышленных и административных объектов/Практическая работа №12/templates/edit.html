@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Редактировать контент</title></head>
+<body>
+    <h1>Редактирование контента #{{ item.идентификатор }}</h1>
+    <form method="POST">
+        <label>Название:</label><br><input type="text" name="название" value="{{ item.название }}" required><br><br>
+        <label>Тип:</label><br>
+        <select name="тип">
+            {% for t in ['книга','видео','аудио','курс','подкаст'] %}
+                <option value="{{ t }}" {% if item.тип == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label>Авторы:</label><br><input type="text" name="авторы" value="{{ item.авторы or '' }}"><br><br>
+        <label>Описание:</label><br><textarea name="описание" rows="3">{{ item.описание or '' }}</textarea><br><br>
+        <label>Уровень:</label><br>
+        <select name="уровень">
+            {% for l in ['начальный','средний','продвинутый'] %}
+                <option value="{{ l }}" {% if item.уровень == l %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+        </select><br><br>
+        <label>Язык:</label><br><input type="text" name="язык" value="{{ item.язык or 'ru' }}"><br><br>
+        <button type="submit">Сохранить</button>
+        <a href="{{ url_for('list_content') }}">Отмена</a>
+    </form>
+</body>
+</html>

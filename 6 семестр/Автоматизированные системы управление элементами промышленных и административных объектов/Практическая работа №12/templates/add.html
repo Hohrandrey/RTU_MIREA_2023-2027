@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Добавить контент</title></head>
+<body>
+    <h1>Добавление нового контента</h1>
+    <form method="POST">
+        <label>Название:</label><br><input type="text" name="название" required><br><br>
+        <label>Тип:</label><br>
+        <select name="тип">
+            <option value="книга">Книга</option>
+            <option value="видео">Видео</option>
+            <option value="аудио">Аудио</option>
+            <option value="курс">Курс</option>
+            <option value="подкаст">Подкаст</option>
+        </select><br><br>
+        <label>Авторы:</label><br><input type="text" name="авторы"><br><br>
+        <label>Описание:</label><br><textarea name="описание" rows="3"></textarea><br><br>
+        <label>Уровень:</label><br>
+        <select name="уровень">
+            <option value="начальный">Начальный</option>
+            <option value="средний">Средний</option>
+            <option value="продвинутый">Продвинутый</option>
+        </select><br><br>
+        <label>Язык:</label><br><input type="text" name="язык" value="ru"><br><br>
+        <button type="submit">Добавить</button>
+        <a href="{{ url_for('list_content') }}">Отмена</a>
+    </form>
+</body>
+</html>

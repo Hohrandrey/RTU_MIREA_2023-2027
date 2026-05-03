@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Каталог контента</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .search-form { margin-bottom: 20px; }
+        .flash-msg { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .danger { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        .btn { padding: 5px 10px; margin: 2px; text-decoration: none; color: white; border-radius: 4px; }
+        .btn-edit { background: #3498db; }
+        .btn-delete { background: #e74c3c; border: none; cursor: pointer; }
+        .btn-add { background: #27ae60; padding: 10px 20px; display: inline-block; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Мультимедиа контент</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <a class="btn btn-add" href="{{ url_for('add_content') }}">+ Добавить контент</a>
+
+    <form class="search-form" method="GET">
+        <input type="text" name="search" value="{{ search }}" placeholder="Поиск по названию или автору...">
+        <button type="submit">Найти</button>
+        {% if search %}
+            <a href="{{ url_for('list_content') }}">Сбросить</a>
+        {% endif %}
+    </form>
+
+    <table>
+        <tr>
+            <th>ID</th><th>Название</th><th>Тип</th><th>Авторы</th><th>Уровень</th><th>Язык</th><th>Действия</th>
+        </tr>
+        {% for item in content %}
+        <tr>
+            <td>{{ item.идентификатор }}</td>
+            <td>{{ item.название }}</td>
+            <td>{{ item.тип }}</td>
+            <td>{{ item.авторы }}</td>
+            <td>{{ item.уровень }}</td>
+            <td>{{ item.язык }}</td>
+            <td>
+                <a class="btn btn-edit" href="{{ url_for('edit_content', id=item.идентификатор) }}">Ред.</a>
+                <form style="display:inline;" method="POST" action="{{ url_for('delete_content', id=item.идентификатор) }}" onsubmit="return confirm('Удалить?');">
+                    <button class="btn btn-delete" type="submit">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">Нет данных</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
